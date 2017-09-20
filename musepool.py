@@ -5,7 +5,7 @@ def parse(song):
 
 listParsed = []
 
-with open('mspl/main.mspl') as f:
+with open('data.mspl') as f:
     listSongs = f.readlines()
     for line in listSongs:
         listParsed.append(parse(line))
