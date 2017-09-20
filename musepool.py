@@ -1,7 +1,7 @@
 from random import shuffle
 
 def parse(song):
-    return (song.strip('\n')).split(' ~ ')
+    return (song.strip('\n')).split(' --- ')
 
 listParsed = []
 
