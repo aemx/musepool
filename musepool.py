@@ -1,3 +1,5 @@
+from random import shuffle
+
 def parse(song):
     return (song.strip('\n')).split(' ~ ')
 
@@ -8,4 +10,6 @@ with open('mspl/main.mspl') as f:
     for line in listSongs:
         listParsed.append(parse(line))
 
+print(listParsed)
+shuffle(listParsed)
 print(listParsed)
