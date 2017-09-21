@@ -3,7 +3,7 @@ from random import shuffle
 import sys
 
 def parse(song):
-    return (song.strip('\n')).split(' --- ')
+    return (song.strip('\n')).split('; ')
 
 def getSec(time):
     mm, ss = time.split(':')
