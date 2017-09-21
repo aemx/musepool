@@ -1,5 +1,6 @@
-from os import execl
+import os
 from random import shuffle
+import sys
 
 def parse(song):
     return (song.strip('\n')).split(' --- ')
@@ -27,20 +28,24 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
             print('\x1b[1A' + '\x1b[2K' + '\x1b[1A')
             runtime -= getSec(song[3])
             lis.append(song)
+
             if idx == len(lis) - 1:
-                print('FAILED')
-                # restart
-                break
+                os.system('clear')
+                print('Failed to compile list. Try again.')
+                sys.exit()
+
             else:
                 continue
 
         elif runtime >= runtimeMin:
-            print('[Total runtime: ' + INVgetSec(runtime) + ']')
+            print('=' * 80)
+            print('[Total runtime: ' + INVgetSec(runtime) + ']\n')
             break
 
         else:
             continue
 
+os.system('clear')
 listParsed = []
 
 with open('data.mspl') as f:
@@ -50,8 +55,10 @@ with open('data.mspl') as f:
         listParsed.append(parse(line))
 
 shuffle(listParsed)
-print(len(listParsed))
+
+print('Playlist 1:')
+print('=' * 80)
 getPlaylist(listParsed, 1500, 1440)
-print(len(listParsed))
+print('Playlist 2:')
+print('=' * 80)
 getPlaylist(listParsed, 1680, 1620)
-print(len(listParsed))
