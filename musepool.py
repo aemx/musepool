@@ -10,6 +10,8 @@ with open('data.mspl') as f:
     for line in listSongs:
         listParsed.append(parse(line))
 
-print(listParsed)
 shuffle(listParsed)
-print(listParsed)
+
+for song in listParsed:
+    print('[' + song[0] + '] ' + song[1] + ' - ' + \
+    song[2] + ' [' + song[3] + ']')
