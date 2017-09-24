@@ -1,6 +1,19 @@
 # Changelog
 _All notable changes to this project will be documented in this file._
 
+## [v0.0.3](https://github.com/aemx/musepool/tree/0.0.3) (2017-09-24)
+
+[Full Changelog](https://github.com/aemx/musepool/compare/0.0.2...0.0.3)
+
+### Added
+
+- Genre variety confirmation
+
+### Changed
+
+- Error handling process
+- Playlist output appearence
+
 ## [v0.0.2](https://github.com/aemx/musepool/tree/0.0.2) (2017-09-21)
 
 [Full Changelog](https://github.com/aemx/musepool/compare/0.0.1...0.0.2)
