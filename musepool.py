@@ -61,8 +61,8 @@ with open('data.mspl') as f:
 
 print('Playlist 1:')
 print('=' * 80)
-print(getPlaylist(listParsed, 1500, 1440)) # 26, 25
+print(getPlaylist(listParsed, 1560, 1500))
 
 print('Playlist 2:')
 print('=' * 80)
-print(getPlaylist(listParsed, 1680, 1620)) # 29, 28
+print(getPlaylist(listParsed, 1740, 1680))
