@@ -1,6 +1,5 @@
 import os
 from random import shuffle
-import sys
 
 def parse(song):
     return (song.strip('\n')).split('; ')
@@ -15,37 +14,42 @@ def INVgetSec(time):
     return (mm + ':' + ss)
 
 def getPlaylist(lis, runtimeMax, runtimeMin):
-    playlist = []
-    genres = []
-    runtime = 0
-    for idx, song in enumerate(lis):
-        print('[' + song[0] + '] ' + song[1] + ' - ' + \
-        song[2] + ' [' + str(getSec(song[3])) + ']')
-        lis.remove(song)
-        runtime += getSec(song[3])
-        genres.append(song[0])
-        if runtime >= runtimeMax:
-            print('\x1b[1A' + '\x1b[2K' + '\x1b[1A')
-            runtime -= getSec(song[3])
-            genres.remove(song[0])
-            lis.append(song)
-            if idx == len(lis) - 1:
-                os.system('clear')
-                print('COMPILE ERROR: Impossible runtime requested.')
-                sys.exit()
-            else:
-                continue
-        elif runtime >= runtimeMin:
-            print('=' * 80)
-            print('[Total runtime: ' + INVgetSec(runtime) + ']\n')
-            if len(genres) > 4:
+    e = 0
+    while e == 0:
+        shuffle(lis)
+        genres = []
+        playlist = []
+        returnstr = []
+        runtime = 0
+        for idx, song in enumerate(lis):
+            returnstr.append('[' + song[0] + '] ' + song[1] + ' - ' + \
+            song[2] + ' [' + str(getSec(song[3])) + ']\n')
+            lis.remove(song)
+            runtime += getSec(song[3])
+            genres.append(song[0])
+            if runtime >= runtimeMax:
+                returnstr.remove('[' + song[0] + '] ' + song[1] + ' - ' + \
+                song[2] + ' [' + str(getSec(song[3])) + ']\n')
+                runtime -= getSec(song[3])
+                genres.remove(song[0])
+                lis.append(song)
+                if idx == len(lis) - 1:
+                    break
+                else:
+                    continue
+            elif runtime >= runtimeMin:
+                returnstr.append('\n[Total runtime: ' + \
+                INVgetSec(runtime) + ']\n')
+                if len(genres) > 4:
+                    e = 1
+                    return ''.join(returnstr)
+                    break
+                else:
+                    break
+            elif idx == len(lis) - 1:
                 break
             else:
-                os.system('clear')
-                print('COMPILE ERROR: Not enough genres.')
-                sys.exit()                
-        else:
-            continue
+                continue
 
 os.system('clear')
 listParsed = []
@@ -55,12 +59,10 @@ with open('data.mspl') as f:
     for line in listSongs:
         listParsed.append(parse(line))
 
-shuffle(listParsed)
-
 print('Playlist 1:')
 print('=' * 80)
-getPlaylist(listParsed, 1500, 1440) # 26, 25
+print(getPlaylist(listParsed, 1500, 1440)) # 26, 25
 
 print('Playlist 2:')
 print('=' * 80)
-getPlaylist(listParsed, 1680, 1620) # 29, 28
+print(getPlaylist(listParsed, 1680, 1620)) # 29, 28
