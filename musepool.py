@@ -13,6 +13,22 @@ def INVgetSec(time):
     ss = str("%02d" % (time % 60))
     return (mm + ':' + ss)
 
+def getCamelot(key):
+    keys = [
+        'G#', 'D#', 'A#', 'F', 'C', 'G',
+        'D', 'A', 'E', 'B', 'F#', 'C#'
+    ]
+    for idx, val in enumerate(keys):
+        if key.strip('m') == val:
+            keynum = idx + 1
+    if 'm' in key:
+        return str(keynum) + 'A'
+    else:
+        keynum += 3
+        if keynum > 12:
+            keynum -= 12
+        return str(keynum) + 'B'
+
 def getPlaylist(lis, runtimeMax, runtimeMin):
     e = 0
     while e == 0:
@@ -22,14 +38,16 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
         returnstr = []
         runtime = 0
         for idx, song in enumerate(lis):
-            returnstr.append('[' + song[0] + '] ' + song[1] + ' - ' + \
-            song[2] + ' [' + str(getSec(song[3])) + ']\n')
+            returnstr.append('[' + getCamelot(song[4]) + '] [' + \
+            song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
+            str(getSec(song[3])) + ']\n')
             lis.remove(song)
             runtime += getSec(song[3])
             genres.append(song[0])
             if runtime >= runtimeMax:
-                returnstr.remove('[' + song[0] + '] ' + song[1] + ' - ' + \
-                song[2] + ' [' + str(getSec(song[3])) + ']\n')
+                returnstr.remove('[' + getCamelot(song[4]) + '] [' + \
+                song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
+                str(getSec(song[3])) + ']\n')
                 runtime -= getSec(song[3])
                 genres.remove(song[0])
                 lis.append(song)
