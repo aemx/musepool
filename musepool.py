@@ -14,24 +14,8 @@ def INVgetSec(time):
     ss = str("%02d" % (time % 60))
     return (mm + ':' + ss)
 
-def getCamelot(key):
-    keys = [
-        'G#', 'D#', 'A#', 'F', 'C', 'G',
-        'D', 'A', 'E', 'B', 'F#', 'C#'
-    ]
-    for idx, val in enumerate(keys):
-        if key.strip('m') == val:
-            keynum = idx + 1
-    if 'm' in key:
-        return str(keynum) + 'A'
-    else:
-        keynum += 3
-        if keynum > 12:
-            keynum -= 12
-        return str(keynum) + 'B'
-
 def traverse(key):
-    num, key = re.findall('\d+|\D+', getCamelot(key))
+    num, key = re.findall('\d+|\D+', key)
     num = int(num)
 
     if num == 12:
@@ -61,7 +45,7 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
         runtime = 0
         lastTraverse = []
         for idx, song in enumerate(lis):
-            returnstr.append('[' + getCamelot(song[4]) + '] [' + \
+            returnstr.append('[' + song[4] + '] [' + \
             song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
             str(getSec(song[3])) + ']\n')
             lis.remove(song)
@@ -70,10 +54,10 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
             if idx == 0:
                 pass
             else:
-                if getCamelot(song[4]) in lastTraverse:
+                if song[4] in lastTraverse:
                     pass
                 else:
-                    returnstr.remove('[' + getCamelot(song[4]) + '] [' + \
+                    returnstr.remove('[' + song[4] + '] [' + \
                     song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
                     str(getSec(song[3])) + ']\n')
                     runtime -= getSec(song[3])
@@ -84,7 +68,7 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
                     else:
                         continue
             if runtime >= runtimeMax:
-                returnstr.remove('[' + getCamelot(song[4]) + '] [' + \
+                returnstr.remove('[' + song[4] + '] [' + \
                 song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
                 str(getSec(song[3])) + ']\n')
                 runtime -= getSec(song[3])
