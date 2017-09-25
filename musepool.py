@@ -59,6 +59,7 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
         playlist = []
         returnstr = []
         runtime = 0
+        lastTraverse = []
         for idx, song in enumerate(lis):
             returnstr.append('[' + getCamelot(song[4]) + '] [' + \
             song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
@@ -66,6 +67,22 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
             lis.remove(song)
             runtime += getSec(song[3])
             genres.append(song[0])
+            if idx == 0:
+                pass
+            else:
+                if getCamelot(song[4]) in lastTraverse:
+                    pass
+                else:
+                    returnstr.remove('[' + getCamelot(song[4]) + '] [' + \
+                    song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
+                    str(getSec(song[3])) + ']\n')
+                    runtime -= getSec(song[3])
+                    genres.remove(song[0])
+                    lis.append(song)
+                    if idx == len(lis) - 1:
+                        break
+                    else:
+                        continue
             if runtime >= runtimeMax:
                 returnstr.remove('[' + getCamelot(song[4]) + '] [' + \
                 song[0] + '] ' + song[1] + ' - ' + song[2] + ' [' + \
@@ -89,6 +106,7 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
             elif idx == len(lis) - 1:
                 break
             else:
+                lastTraverse = traverse(song[4])
                 continue
 
 os.system('clear')
