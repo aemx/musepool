@@ -1,4 +1,5 @@
 import os
+import re
 from random import shuffle
 
 def parse(song):
@@ -28,6 +29,27 @@ def getCamelot(key):
         if keynum > 12:
             keynum -= 12
         return str(keynum) + 'B'
+
+def traverse(key):
+    num, key = re.findall('\d+|\D+', getCamelot(key))
+    num = int(num)
+
+    if num == 12:
+        fNum = '1'
+        bNum = '11'
+    elif num == 1:
+        fNum = '2'
+        bNum = '12'
+    else:
+        fNum = str(num + 1)
+        bNum = str(num - 1)
+
+    if key == 'A':
+        nKey = 'B'
+    else:
+        nKey = 'A'
+
+    return [bNum + key, str(num) + key, fNum + key, str(num) + nKey]
 
 def getPlaylist(lis, runtimeMax, runtimeMin):
     e = 0
