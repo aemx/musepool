@@ -1,6 +1,15 @@
 # Changelog
 _All notable changes to this project will be documented in this file._
 
+## [v0.0.5](https://github.com/aemx/musepool/tree/0.0.5) (2017-09-27)
+
+[Full Changelog](https://github.com/aemx/musepool/compare/0.0.4...0.0.5)
+
+### Added
+
+- File writing capabilities
+- Input/output prompt
+
 ## [v0.0.4](https://github.com/aemx/musepool/tree/0.0.4) (2017-09-25)
 
 [Full Changelog](https://github.com/aemx/musepool/compare/0.0.3...0.0.4)
