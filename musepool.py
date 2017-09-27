@@ -1,3 +1,4 @@
+import io
 import os
 import re
 from random import shuffle
@@ -86,7 +87,7 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
 
             elif runtime >= runtimeMin:
                 returnstr.append('\n[Total runtime: ' + \
-                INVgetSec(runtime) + ']\n')
+                INVgetSec(runtime) + ']')
 
                 if len(genres) > 4:
                     e = 1
@@ -101,6 +102,34 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
 
             else:
                 lastTraverse = traverse(song[4])
+
+def findSongs(returnstr):
+    playlistSongs, listMatch = [], []
+
+    for song in returnstr.split('\n'):
+        if song == '':
+            break
+
+        else:
+            playlistSongs.append(song)
+
+    for song in playlistSongs:
+        x = 1
+        strSong = ''
+
+        for obj in song.split(' - '):
+            if x == 1:
+                strSong += obj.split('] ')[-1] + '; '
+            else:
+                strSong += obj.split(' [')[0] + ';'
+            x += 1
+
+        listMatch.append(strSong)
+    
+    for song in listMatch:
+        for songWithInfo in listSongs:
+            if song in songWithInfo:
+                listSongs.remove(songWithInfo)
 
 os.system('clear')
 
@@ -129,11 +158,33 @@ while True:
 
         print('Playlist 1:')
         print('=' * 80)
-        print(getPlaylist(listParsed, 1560, 1500))
+        returnstrA = getPlaylist(listParsed, 1560, 1500)
+        findSongs(returnstrA)
+        print(returnstrA)
 
-        print('Playlist 2:')
+        print('\nPlaylist 2:')
         print('=' * 80)
-        print(getPlaylist(listParsed, 1740, 1680))
+        returnstrB = getPlaylist(listParsed, 1740, 1680)
+        print(returnstrB)
+        findSongs(returnstrB)
+
+        while True:
+            selectConfirm = input('\nMove this playlist to a new file? [Y/n] ')
+
+            if selectConfirm.lower() in ('yes', 'ye', 'y', ''):
+                fname = input('\nEnter a filename: ')
+                with open('output/' + fname + '.mspl', 'w') as fpl:
+                    fpl.write(returnstrA + '\n\n' + returnstrB)
+                print('\n' + fname + '.mspl' + ' successfully created.\n')
+                break
+
+            elif selectConfirm.lower() in ('no', 'n'):
+                print('\nExiting...\n')
+                sys.exit()
+
+            else:
+                print('\nPlease respond with "yes/y" or "no/n".\n')
+                continue
         break
 
     elif selectIO is 'i':
