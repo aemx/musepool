@@ -1,6 +1,7 @@
 import os
 import re
 from random import shuffle
+import sys
 
 def parse(song):
     return (song.strip('\n')).split('; ')
@@ -105,7 +106,6 @@ def getPlaylist(lis, runtimeMax, runtimeMin):
                 lastTraverse = traverse(song[4])
 
 os.system('clear')
-listParsed = []
 
 print('Please select an option:')
 print('  o - output')
@@ -121,30 +121,57 @@ while True:
         continue
 
     if selectIO == 'o':
-        print('\no selected\n')
+        os.system('clear')
+        listParsed = []
+
+        with open('data.mspl') as f:
+            listSongs = f.readlines()
+
+            for line in listSongs:
+                listParsed.append(parse(line))
+
+        print('Playlist 1:')
+        print('=' * 80)
+        print(getPlaylist(listParsed, 1560, 1500))
+
+        print('Playlist 2:')
+        print('=' * 80)
+        print(getPlaylist(listParsed, 1740, 1680))
         break
 
     elif selectIO is 'i':
-        print('\ni selected\n')
+        os.system('clear')
+
+        inputGenre = input('Enter the genre of this song: ')
+        inputArtist = input('Enter a list of artists featured in this ' + \
+        'song, separated by a comma: ')
+        inputTitle = input('Enter the title of this song: ')
+        inputLen = input('Enter the length of this song in [MM:SS] format: ')
+        inputKey = input('Enter the key of the song in Camelot format: ')
+
+        print('\n[' + inputKey + '] [' + inputGenre + '] ' + inputArtist + \
+        ' - ' + inputTitle + ' [' + inputLen + ']\n')
+
+        while True:
+            selectInput = input('Is this okay? [Y/n] ')
+
+            if selectInput.lower() in ('yes', 'ye', 'y', ''):
+                print('\nY was selected.\n')
+                break
+
+            elif selectInput.lower() in ('no', 'n'):
+                print('\nExiting...\n')
+                sys.exit()
+
+            else:
+                print('\nPlease respond with "yes/y" or "no/n".\n')
+                continue
         break
 
     elif selectIO is 'x':
-        print('\nx selected\n')
-        break
+        print('\nExiting...\n')
+        sys.exit()
     
     else:
         print('\nIncorrect operation specified. Please retry.\n')
         continue
-
-with open('data.mspl') as f:
-    listSongs = f.readlines()
-    for line in listSongs:
-        listParsed.append(parse(line))
-
-print('Playlist 1:')
-print('=' * 80)
-print(getPlaylist(listParsed, 1560, 1500))
-
-print('Playlist 2:')
-print('=' * 80)
-print(getPlaylist(listParsed, 1740, 1680))
