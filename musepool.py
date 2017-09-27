@@ -120,8 +120,10 @@ def findSongs(returnstr):
         for obj in song.split(' - '):
             if x == 1:
                 strSong += obj.split('] ')[-1] + '; '
+
             else:
                 strSong += obj.split(' [')[0] + ';'
+                
             x += 1
 
         listMatch.append(strSong)
@@ -173,8 +175,16 @@ while True:
 
             if selectConfirm.lower() in ('yes', 'ye', 'y', ''):
                 fname = input('\nEnter a filename: ')
+                if not os.path.exists('output'):
+                    os.makedirs('output')
+
                 with open('output/' + fname + '.mspl', 'w') as fpl:
                     fpl.write(returnstrA + '\n\n' + returnstrB)
+
+                with open('data.mspl', 'w') as f:
+                    for song in listSongs:
+                        f.write(song)
+
                 print('\n' + fname + '.mspl' + ' successfully created.\n')
                 break
 
@@ -185,6 +195,7 @@ while True:
             else:
                 print('\nPlease respond with "yes/y" or "no/n".\n')
                 continue
+
         break
 
     elif selectIO is 'i':
