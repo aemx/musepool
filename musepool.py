@@ -3,9 +3,6 @@ import re
 from random import shuffle
 import sys
 
-def parse(song):
-    return (song.strip('\n')).split('; ')
-
 def getSec(time):
     mm, ss = time.split(':')
     return (int(mm) * 60) + int(ss)
@@ -128,7 +125,7 @@ while True:
             listSongs = f.readlines()
 
             for line in listSongs:
-                listParsed.append(parse(line))
+                listParsed.append(line.strip('\n').split('; '))
 
         print('Playlist 1:')
         print('=' * 80)
