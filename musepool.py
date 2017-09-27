@@ -156,7 +156,10 @@ while True:
             selectInput = input('Is this okay? [Y/n] ')
 
             if selectInput.lower() in ('yes', 'ye', 'y', ''):
-                print('\nY was selected.\n')
+                with open('data.mspl', 'a') as f:
+                    f.write('\n' + inputGenre + '; ' + inputArtist + '; ' +
+                    inputTitle + '; ' + inputLen + '; ' + inputKey)
+                print()
                 break
 
             elif selectInput.lower() in ('no', 'n'):
