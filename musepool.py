@@ -58,6 +58,23 @@ def check_key(key):
     return [key, key_ccw, key_cw, key_swap]
 
 # -----------------------------------------------------------------------------
+# Converts a time in MM:SS format to seconds only.
+# -----------------------------------------------------------------------------
+
+def get_sec(time):
+    mm, ss = time.split(':')
+    return (int(mm) * 60) + int(ss)
+
+# -----------------------------------------------------------------------------
+# Converts a time in seconds to MM:SS format (string).
+# -----------------------------------------------------------------------------
+
+def inv_sec(time):
+    mm = str(int(time / 60))
+    ss = str('%02d' % (time % 60))
+    return (mm + ':' + ss)
+
+# -----------------------------------------------------------------------------
 # Load and shuffle a CSV, then create two DataFrames, one with every song
 # listed in the CSV, and one with all songs that have not been flagged [P].
 # -----------------------------------------------------------------------------
@@ -77,21 +94,46 @@ print(count(df_muse) + '/' + count(df) + ' songs available for use.')
 
 muse_out = []
 cur_artist = df_muse['artist'].iloc[0]
+all_artist = cur_artist.split('|')
 cur_key = df_muse['key'].iloc[0]
+cur_idx = df_muse.iloc[0].name
 runtime = 0
 
 add(cur_artist, df_muse['title'].iloc[0], muse_out)
-print(muse_out)
+df_muse.drop([cur_idx], inplace=True)
+
+print('Creating playlist...')
 
 # -----------------------------------------------------------------------------
-# Create the playlist. Filter keys / Filter lengths / Filter artists.
+# Filter keys, lengths, and artists accordingly, finishing the playlist.
 # -----------------------------------------------------------------------------
 
-'''
-while runtime < 26:
+failsafe = 100
+r_min = 21 * 60
+r_max = 22 * 60
+
+while runtime < r_min:
     tf_key = df_muse['key'].isin(check_key(cur_key))
     df_key = df_muse[tf_key].copy()
 
-for idx, row in df_muse.iterrows():
-    print((row['artist'].split('|')))
-'''
+    for idx, song in df_key.iterrows():
+        if runtime + get_sec(song['time']) < r_max:
+            cur_artist = song['artist']
+            all_artist.extend(song['artist'].split('|'))
+            cur_key = song['key']
+            cur_idx = song.name
+            runtime += get_sec(song['time'])
+            add(cur_artist, song['title'], muse_out)
+            df_muse.drop([cur_idx], inplace=True)
+            break
+        elif failsafe == 0:
+            runtime += r_min
+            break
+        else:
+            failsafe -= 1
+            continue
+
+if failsafe == 0:
+    print(inv_sec(runtime - r_min), muse_out)
+else:
+    print(inv_sec(runtime), muse_out)
