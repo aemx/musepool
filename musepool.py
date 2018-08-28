@@ -93,7 +93,7 @@ os.system('clear')
 print(
 
     '╔═════════════════════╤═══════════════════╗\n' + \
-    '║  musepool 0.1.0-b2  │    ' + count(tf_muse) + '  /  ' + count(df) + '    ║\n' + \
+    '║   musepool v0.1.0   │    ' + count(tf_muse) + '  /  ' + count(df) + '    ║\n' + \
     '╟─────────────────────┴───────────────────╢\n' + \
     '║  Type \'z\' to create a short playlist.   ║\n' + \
     '║  Type \'x\' to create a long playlist.    ║\n' + \

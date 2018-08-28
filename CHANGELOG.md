@@ -1,6 +1,21 @@
 # Changelog
 _All notable changes to this project will be documented in this file._
 
+## [v0.1.0](https://github.com/aemx/musepool/tree/0.1.0) (2018-08-28)
+
+[Full Changelog](https://github.com/aemx/musepool/compare/0.0.6...0.1.0)
+
+### Added
+
+- Faster data analysis using pandas
+- Failsafe system to prevent infinite loops
+- Git ignore file
+
+### Changed
+
+- Database format (`.mspl` → `.csv`)
+- Output format (`.msplx` → `.md`)
+
 ## [v0.0.6](https://github.com/aemx/musepool/tree/0.0.6) (2017-09-27)
 
 [Full Changelog](https://github.com/aemx/musepool/compare/0.0.5...0.0.6)
