@@ -1,19 +1,14 @@
+import datetime
 import numpy as np
 import pandas as pd
 import re
 
-# -----------------------------------------------------------------------------
 # Count the number of entries in a DataFrame, then output as a string.
-# -----------------------------------------------------------------------------
-
 def count(dataframe):
     return str(len(dataframe.index))
 
-# -----------------------------------------------------------------------------
 # Function to add a track to an output list.
-# -----------------------------------------------------------------------------
-
-def add(artist, title, output): #, dataframe):
+def add(artist, title, output):
     artist_list = artist.split('|')
     artist_return = []
 
@@ -35,18 +30,12 @@ def add(artist, title, output): #, dataframe):
     
     output.extend([returnstr])
 
-# -----------------------------------------------------------------------------
 # Auxiliary mode toggler for keymatcher (below).
-# -----------------------------------------------------------------------------
-
 def toggle(v):
     if v == 'A': return 'B'
     elif v == 'B': return 'A'
 
-# -----------------------------------------------------------------------------
 # Keymatching function.
-# -----------------------------------------------------------------------------
-
 def keymatch(key):
     num, mode = re.findall('\d+|\D+', key)
     inum = int(num)
@@ -57,25 +46,16 @@ def keymatch(key):
 
     return [key, key_ccw, key_cw, key_swap]
 
-# -----------------------------------------------------------------------------
 # Converts a time in MM:SS format to seconds only.
-# -----------------------------------------------------------------------------
-
 def get_sec(time):
     mm, ss = time.split(':')
     return (int(mm) * 60) + int(ss)
 
-# -----------------------------------------------------------------------------
 # Compare two lists, then return False if one value matches between both lists.
-# -----------------------------------------------------------------------------
-
 def compare(a, b):
     return not bool(set(a) & set(b))
 
-# -----------------------------------------------------------------------------
 # Converts a time in seconds to MM:SS format (string).
-# -----------------------------------------------------------------------------
-
 def inv_sec(time):
     mm = str(int(time / 60))
     ss = str('%02d' % (time % 60))
@@ -100,8 +80,8 @@ print(count(tf_muse) + '/' + count(df) + ' songs available for use.')
 
 muse_out = []
 runtime = 0
-r_min = 21 * 60
-r_max = 22 * 60
+r_min = 20 * 60
+r_max = 21 * 60
 
 while (runtime < r_min or
 runtime > r_max):
@@ -115,6 +95,7 @@ runtime > r_max):
     all_artist = cur_artist.split('|')
     cur_key = df_muse['key'].iloc[0]
     cur_idx = df_muse.iloc[0].name
+    all_idx = [cur_idx]
     runtime = get_sec(df_muse['time'].iloc[0])
 
     add(cur_artist, df_muse['title'].iloc[0], muse_out)
@@ -138,6 +119,7 @@ runtime > r_max):
                 all_artist.extend(cur_artist.split('|'))
                 cur_key = song['key']
                 cur_idx = song.name
+                all_idx.extend([cur_idx])
                 runtime += get_sec(song['time'])
                 add(cur_artist, song['title'], muse_out)
                 df_muse.drop([cur_idx], inplace=True)
@@ -147,9 +129,29 @@ runtime > r_max):
                 continue
 
 # -----------------------------------------------------------------------------
-# Print the playlist.
+# Flag and update the CSV.
 # -----------------------------------------------------------------------------
 
-print('\n' + inv_sec(runtime))
-for song in muse_out:
-    print(song)
+for idx in all_idx:
+    df['flag'].iloc[idx] = 'P'
+
+df.to_csv('data.csv',index=False)
+
+print('CSV flagged and updated.')
+
+# -----------------------------------------------------------------------------
+# Save the playlist to an MD file.
+# -----------------------------------------------------------------------------
+
+day = datetime.date.today()
+showday = day + datetime.timedelta((4 - day.weekday()) % 7)
+showstr = showday.strftime('%y%m%d')
+
+md_out = open('output/' + showstr + '-test.md', 'w')
+
+for line in muse_out:
+    md_out.write('- ' + line + '\n')
+
+md_out.write('\n' + 'Runtime ━ ' + inv_sec(runtime))
+
+print('Playlist successfully compiled!')
