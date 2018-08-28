@@ -1,7 +1,9 @@
 import datetime
 import numpy as np
+import os
 import pandas as pd
 import re
+import sys
 
 # Count the number of entries in a DataFrame, then output as a string.
 def count(dataframe):
@@ -55,6 +57,18 @@ def get_sec(time):
 def compare(a, b):
     return not bool(set(a) & set(b))
 
+# Create a yes/no prompt from a single string.
+def yn(string):
+    while True:
+        prompt = input(string + ' [Y/n] ')
+        if prompt.lower() in ('yes', 'ye', 'y', ''):
+            return True
+        elif prompt.lower() in ('no', 'n'):
+            return False
+        else:
+            print('\nPlease respond with "yes/y" or "no/n".')
+            continue
+
 # Converts a time in seconds to MM:SS format (string).
 def inv_sec(time):
     mm = str(int(time / 60))
@@ -70,88 +84,147 @@ df = pd.read_csv('data.csv')
 tf = df['flag'] != 'P'
 tf_muse = df[tf].copy()
 
-print('CSV successfully loaded.')
-print(count(tf_muse) + '/' + count(df) + ' songs available for use.')
-
 # -----------------------------------------------------------------------------
-# Initialize important values, then begin the playlist's creation by adding the
-# first track that appears in df_muse.
+# Begin an input prompt loop for the user.
 # -----------------------------------------------------------------------------
 
-muse_out = []
-runtime = 0
-r_min = 20 * 60
-r_max = 21 * 60
+os.system('clear')
 
-while (runtime < r_min or
-runtime > r_max):
+print(
 
-    sf = df.reindex(np.random.permutation(df.index)).copy()
-    tf = sf['flag'] != 'P'
-    df_muse = sf[tf].copy()
-    muse_out = []
+    '╔═════════════════════╤═══════════════════╗\n' + \
+    '║  musepool 0.1.0-b1  │    ' + count(tf_muse) + '  /  ' + count(df) + '    ║\n' + \
+    '╟─────────────────────┴───────────────────╢\n' + \
+    '║  Type \'z\' to create a short playlist.   ║\n' + \
+    '║  Type \'x\' to create a long playlist.    ║\n' + \
+    '║  Press enter to exit the program.       ║\n' + \
+    '╚═════════════════════════════════════════╝\n'
+)
 
-    cur_artist = df_muse['artist'].iloc[0]
-    all_artist = cur_artist.split('|')
-    cur_key = df_muse['key'].iloc[0]
-    cur_idx = df_muse.iloc[0].name
-    all_idx = [cur_idx]
-    runtime = get_sec(df_muse['time'].iloc[0])
+while True:
+    try:
+        selector = input('>>> ')
+    
+    except ValueError:
+        print('\nIncorrect operation specified. Please retry.\n')
+        continue
+    
+    if selector in ('z', 'x'):
 
-    add(cur_artist, df_muse['title'].iloc[0], muse_out)
-    df_muse.drop([cur_idx], inplace=True)
+        # ---------------------------------------------------------------------
+        # Initialize important values, then begin the playlist's creation by
+        # adding the first track that appears in df_muse.
+        # ---------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------
-# Filter keys, lengths, and artists accordingly, finishing the playlist.
-# -----------------------------------------------------------------------------
+        if selector == 'z':
+            r_min = 20 * 60
+            r_max = 21 * 60
+            part = 'A'
+        elif selector == 'x':
+            r_min = 27 * 60
+            r_max = 28 * 60
+            part = 'B'    
 
-    failsafe = int(count(df))
+        muse_out = []
+        runtime = 0
 
-    while (runtime < r_min and
-    failsafe > 0):
-        tf_key = df_muse['key'].isin(keymatch(cur_key))
-        df_key = df_muse[tf_key].copy()
+        while (runtime < r_min or
+        runtime > r_max):
 
-        for idx, song in df_key.iterrows():
-            if (runtime + get_sec(song['time']) < r_max and
-            compare(song['artist'].split('|'), all_artist)):
-                cur_artist = song['artist']
-                all_artist.extend(cur_artist.split('|'))
-                cur_key = song['key']
-                cur_idx = song.name
-                all_idx.extend([cur_idx])
-                runtime += get_sec(song['time'])
-                add(cur_artist, song['title'], muse_out)
-                df_muse.drop([cur_idx], inplace=True)
-                break
-            else:
-                failsafe -= 1
-                continue
+            sf = df.reindex(np.random.permutation(df.index)).copy()
+            tf = sf['flag'] != 'P'
+            df_muse = sf[tf].copy()
+            muse_out = []
 
-# -----------------------------------------------------------------------------
-# Flag and update the CSV.
-# -----------------------------------------------------------------------------
+            cur_artist = df_muse['artist'].iloc[0]
+            all_artist = cur_artist.split('|')
+            cur_key = df_muse['key'].iloc[0]
+            cur_idx = df_muse.iloc[0].name
+            all_idx = [cur_idx]
+            runtime = get_sec(df_muse['time'].iloc[0])
 
-for idx in all_idx:
-    df['flag'].iloc[idx] = 'P'
+            add(cur_artist, df_muse['title'].iloc[0], muse_out)
+            df_muse.drop([cur_idx], inplace=True)
 
-df.to_csv('data.csv',index=False)
+            # -----------------------------------------------------------------
+            # Filter keys, lengths, and artists accordingly.
+            # -----------------------------------------------------------------
 
-print('CSV flagged and updated.')
+            failsafe = int(count(df))
 
-# -----------------------------------------------------------------------------
-# Save the playlist to an MD file.
-# -----------------------------------------------------------------------------
+            while (runtime < r_min and
+            failsafe > 0):
+                tf_key = df_muse['key'].isin(keymatch(cur_key))
+                df_key = df_muse[tf_key].copy()
 
-day = datetime.date.today()
-showday = day + datetime.timedelta((4 - day.weekday()) % 7)
-showstr = showday.strftime('%y%m%d')
+                for idx, song in df_key.iterrows():
+                    if (runtime + get_sec(song['time']) < r_max and
+                    compare(song['artist'].split('|'), all_artist)):
+                        cur_artist = song['artist']
+                        all_artist.extend(cur_artist.split('|'))
+                        cur_key = song['key']
+                        cur_idx = song.name
+                        all_idx.extend([cur_idx])
+                        runtime += get_sec(song['time'])
+                        add(cur_artist, song['title'], muse_out)
+                        df_muse.drop([cur_idx], inplace=True)
+                        break
+                    else:
+                        failsafe -= 1
+                        continue
 
-md_out = open('output/' + showstr + '-test.md', 'w')
+        # ---------------------------------------------------------------------
+        # Ask the user if they are okay with saving the generated playlist,
+        # then ask for an episode number for the filename.
+        # ---------------------------------------------------------------------
 
-for line in muse_out:
-    md_out.write('- ' + line + '\n')
+        print('\nYour generated playlist (runs for ' + inv_sec(runtime) + '):\n')
 
-md_out.write('\n' + 'Runtime ━ ' + inv_sec(runtime))
+        for line in muse_out:
+            print(line)
 
-print('Playlist successfully compiled!')
+        yn_save = yn('\nIs this okay?')
+
+        if yn_save == False:
+            print('\nExiting...\n')
+            break
+        
+        episode = input('\nPlease select an episode number to identify your file: ')
+
+        # ---------------------------------------------------------------------
+        # Flag and update the CSV, then save the playlist to an MD file.
+        # ---------------------------------------------------------------------
+
+        for idx in all_idx:
+            df['flag'].iloc[idx] = 'P'
+
+        df.to_csv('data.csv',index=False)
+
+        day = datetime.date.today()
+        year = day.strftime('%y')
+        year_day = int(day.strftime('%j'))
+
+        if year_day > 183:
+            semester = 'F'
+        else:
+            semester = 'S'
+        
+        production_code = semester + year + episode.zfill(2) + part
+
+        with open('output/' + production_code + '.md', 'w') as md_out:
+            md_out.write('# **' + production_code + ' (' + inv_sec(runtime) + ')** #\n')
+            for line in muse_out:
+                md_out.write('- ' + line + '\n')
+        md_out.close()
+
+        print('\nPlaylist \"' + production_code + '.md\" successfully compiled!\n')
+
+    # -------------------------------------------------------------------------
+    # Miscellaneous input responses.
+    # -------------------------------------------------------------------------
+
+    elif selector is '':
+        print('\nExiting...\n')
+        sys.exit()
+    else:
+        print('\nIncorrect operation specified. Please retry.\n')
