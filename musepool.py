@@ -93,10 +93,11 @@ os.system('clear')
 print(
 
     '╔═════════════════════╤═══════════════════╗\n' + \
-    '║  musepool 0.1.0-b1  │    ' + count(tf_muse) + '  /  ' + count(df) + '    ║\n' + \
+    '║  musepool 0.1.0-b2  │    ' + count(tf_muse) + '  /  ' + count(df) + '    ║\n' + \
     '╟─────────────────────┴───────────────────╢\n' + \
     '║  Type \'z\' to create a short playlist.   ║\n' + \
     '║  Type \'x\' to create a long playlist.    ║\n' + \
+    '║  Type \'c\' to insert a new track.        ║\n' + \
     '║  Press enter to exit the program.       ║\n' + \
     '╚═════════════════════════════════════════╝\n'
 )
@@ -108,14 +109,13 @@ while True:
     except ValueError:
         print('\nIncorrect operation specified. Please retry.\n')
         continue
-    
+
+    # ---------------------------------------------------------------------
+    # Initialize important values, then begin the playlist's creation by
+    # adding the first track that appears in df_muse.
+    # ---------------------------------------------------------------------
+
     if selector in ('z', 'x'):
-
-        # ---------------------------------------------------------------------
-        # Initialize important values, then begin the playlist's creation by
-        # adding the first track that appears in df_muse.
-        # ---------------------------------------------------------------------
-
         if selector == 'z':
             r_min = 20 * 60
             r_max = 21 * 60
@@ -130,7 +130,6 @@ while True:
 
         while (runtime < r_min or
         runtime > r_max):
-
             sf = df.reindex(np.random.permutation(df.index)).copy()
             tf = sf['flag'] != 'P'
             df_muse = sf[tf].copy()
@@ -156,7 +155,6 @@ while True:
             failsafe > 0):
                 tf_key = df_muse['key'].isin(keymatch(cur_key))
                 df_key = df_muse[tf_key].copy()
-
                 for idx, song in df_key.iterrows():
                     if (runtime + get_sec(song['time']) < r_max and
                     compare(song['artist'].split('|'), all_artist)):
@@ -171,7 +169,6 @@ while True:
                         break
                     else:
                         failsafe -= 1
-                        continue
 
         # ---------------------------------------------------------------------
         # Ask the user if they are okay with saving the generated playlist,
@@ -218,6 +215,29 @@ while True:
         md_out.close()
 
         print('\nPlaylist \"' + production_code + '.md\" successfully compiled!\n')
+
+    # -------------------------------------------------------------------------
+    # Prompt the user to insert a track into the CSV, then do so if requested.
+    # -------------------------------------------------------------------------
+
+    elif selector is 'c':
+        input_artist = input('\nEnter a list of artists featured in this song, separated by a \'|\': ')
+        input_title = input('\nEnter the full title of this song: ')
+        input_len = input('\nEnter the length of this song in [mm:ss] format: ')
+        input_key = input('\nEnter the key of the song in Camelot format: ')
+
+        yn_input = yn('\nIs this okay?')
+
+        if yn_input == False:
+            print('\nExiting...\n')
+            break
+
+        insertion = pd.DataFrame([[input_artist, input_title, input_len, input_key, 'N']], columns=['artist', 'title', 'time', 'key', 'flag'])
+        df = df.append(insertion, ignore_index=True)
+        df.sort_values(['artist', 'title'], inplace=True)
+        df.to_csv('data.csv',index=False)
+
+        print('\nDatabase successfully updated!\n')
 
     # -------------------------------------------------------------------------
     # Miscellaneous input responses.
